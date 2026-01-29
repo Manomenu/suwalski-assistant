@@ -2,6 +2,8 @@ import asyncio
 import os
 from google.adk.agents import Agent
 from google.adk.models.lite_llm import LiteLlm
+from google.adk.runners import InMemoryRunner
+from google.genai import types
 
 async def async_main():
     """
@@ -26,22 +28,35 @@ async def async_main():
             instruction="You are a helpful AI assistant running locally via Ollama. Keep your responses concise."
         )
 
-        # Generate a response
-        query = "hello"
-        print(f"User: {query}")
-        
-        # Note: The exact method might vary based on ADK version, 
-        # but generate_response is standard.
-        response = await agent.generate_response(query)
-        
-        print(f"Agent: {response.text}")
+        # Create the runner
+        runner = InMemoryRunner(agent=agent)
+
+        # Create session explicitly
+        await runner.session_service.create_session(
+            app_name=runner.app_name,
+            user_id="local_user",
+            session_id="local_session"
+        )
+
+        # Create user message
+        user_msg = types.Content(parts=[types.Part(text="hello")])
+        print(f"User: hello")
+
+        # Run the agent
+        async for event in runner.run_async(
+            user_id="local_user",
+            session_id="local_session",
+            new_message=user_msg
+        ):
+            # Print agent responses
+            if event.author == "OllamaAssistant" and event.content:
+                for part in event.content.parts:
+                    if part.text:
+                        print(f"Agent: {part.text}")
 
     except Exception as e:
         print(f"\nError: Could not connect to Ollama or generate response.")
         print(f"Details: {e}")
-        print("\nTroubleshooting:")
-        print("1. Ensure Docker is running and the Ollama container is up: `docker-compose up -d`")
-        print(f"2. Ensure you have the model pulled: `docker exec -it <container_id> ollama pull {model_name.replace('ollama/', '')}`")
 
 def main():
     """

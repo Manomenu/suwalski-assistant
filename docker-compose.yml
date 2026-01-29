@@ -11,6 +11,10 @@ services:
       - "11434:11434"
     volumes:
       - ollama_storage:/root/.ollama
+      - ./scripts/infrastructure/ollama-entrypoint.sh:/entrypoint.sh
+    entrypoint: ["/entrypoint.sh"]
+    environment:
+      - OLLAMA_MODEL=ollama/qwen2:0.5b
     restart: always
     # No profile set means this runs by default (Infrastructure)
 
