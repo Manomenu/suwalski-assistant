@@ -1,0 +1,30 @@
+# Infrastructure Services for Development
+# 
+# Strategy: Run infrastructure (Ollama, Databases) here.
+# Run the application logic locally (via `uv run` or VS Code) for easier debugging and faster iteration.
+# To deploy the full stack, create a separate docker-compose.prod.yml or use profiles.
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_storage:/root/.ollama
+    restart: always
+    # No profile set means this runs by default (Infrastructure)
+
+  app:
+    build: .
+    profiles: ["fullstack"]
+    depends_on:
+      - ollama
+    environment:
+      - OLLAMA_API_BASE=http://ollama:11434
+      - OLLAMA_MODEL=ollama/qwen2:0.5b
+    volumes:
+      - .:/app
+    command: uv run start
+
+volumes:
+  ollama_storage:

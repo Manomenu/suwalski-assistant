@@ -1,0 +1,23 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug: Main App (with Infra)",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/suwalski_assistant/main.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "start-infra",
+            "postDebugTask": "stop-infra"
+        },
+        {
+            "name": "Debug: Main App",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/suwalski_assistant/main.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}
