@@ -10,8 +10,6 @@ async def async_main():
     Connects to a local Ollama instance using Google ADK and LiteLLM,
     and prints a response to 'hello'.
     """
-    # Configuration
-    # Ensure you have pulled the model: `ollama pull qwen2:0.5b`
     model_name = os.getenv("OLLAMA_MODEL", "ollama/qwen2:0.5b")
     
     print(f"Connecting to Ollama using model: {model_name}...")
