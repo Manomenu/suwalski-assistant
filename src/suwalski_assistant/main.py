@@ -1,33 +1,18 @@
 import asyncio
-import os
-from google.adk.agents import Agent
-from google.adk.models.lite_llm import LiteLlm
 from google.adk.runners import InMemoryRunner
 from google.genai import types
+from suwalski_assistant.ollama_agent import ollama_agent
 
 async def async_main():
     """
     Connects to a local Ollama instance using Google ADK and LiteLLM,
     and prints a response to 'hello'.
     """
-    model_name = os.getenv("OLLAMA_MODEL", "ollama/qwen2:0.5b")
-    
-    print(f"Connecting to Ollama using model: {model_name}...")
+    print(f"Connecting to Ollama using agent: {ollama_agent.name}...")
     
     try:
-        # Initialize the model wrapper
-        # LiteLLM handles the connection to Ollama
-        ollama_model = LiteLlm(model=model_name)
-
-        # Create the agent
-        agent = Agent(
-            name="OllamaAssistant",
-            model=ollama_model,
-            instruction="You are a helpful AI assistant running locally via Ollama. Keep your responses concise."
-        )
-
-        # Create the runner
-        runner = InMemoryRunner(agent=agent)
+        # Create the runner with the imported agent
+        runner = InMemoryRunner(agent=ollama_agent)
 
         # Create session explicitly
         await runner.session_service.create_session(
@@ -47,7 +32,7 @@ async def async_main():
             new_message=user_msg
         ):
             # Print agent responses
-            if event.author == "OllamaAssistant" and event.content:
+            if event.author == ollama_agent.name and event.content:
                 for part in event.content.parts:
                     if part.text:
                         print(f"Agent: {part.text}")
@@ -55,6 +40,9 @@ async def async_main():
     except Exception as e:
         print(f"\nError: Could not connect to Ollama or generate response.")
         print(f"Details: {e}")
+        print("\nTroubleshooting:")
+        print("1. Ensure Docker is running and the Ollama container is up: `docker-compose up -d`")
+        print(f"2. Ensure you have the model pulled: `docker exec -it <container_id> ollama pull <model_name>`")
 
 def main():
     """
