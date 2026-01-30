@@ -14,7 +14,6 @@ async def async_main():
         # Create the runner with the imported agent
         runner = InMemoryRunner(agent=ollama_agent)
 
-        # Create session explicitly
         await runner.session_service.create_session(
             app_name=runner.app_name,
             user_id="local_user",

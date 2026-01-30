@@ -1,6 +1,9 @@
 import os
 from google.adk.agents import Agent
 from google.adk.models.lite_llm import LiteLlm
+import logging
+
+logging.getLogger("LiteLLM").setLevel(logging.CRITICAL)
 
 # Configuration
 # Ensure you have pulled the model: `ollama pull qwen2:0.5b`
