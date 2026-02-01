@@ -1,19 +1,15 @@
 import os
 import discord
-from dotenv import load_dotenv
 from google.adk.runners import Runner
 from google.adk.sessions.in_memory_session_service import InMemorySessionService
 from google.genai import types
-
-# Load environment variables
-load_dotenv()
 
 class SuwalskiBot(discord.Client):
     """
     Custom Discord Client for Suwalski Assistant.
     Encapsulates the ADK runner and agent logic.
     """
-    def __init__(self, runner, agent_name, target_channel_id=None, intents=None):
+    def __init__(self, runner: Runner, agent_name: str, target_channel_id: str=None, intents=None):
         super().__init__(intents=intents)
         self.runner = runner
         self.agent_name = agent_name
@@ -46,8 +42,32 @@ class SuwalskiBot(discord.Client):
             await session_service.create_session(app_name=self.runner.app_name, user_id=user_id, session_id=session_id)
 
         # Prepare input
-        user_msg = types.Content(parts=[types.Part(text=message.content)])
-        print(f"Received message from {message.author}: {message.content}")
+        parts = []
+        if message.content:
+            parts.append(types.Part(text=message.content))
+            
+        for attachment in message.attachments:
+            if attachment.content_type and attachment.content_type.startswith('image/'):
+                print(f"Processing image attachment: {attachment.filename}")
+                try:
+                    image_data = await attachment.read()
+                    parts.append(
+                        types.Part(
+                            inline_data=types.Blob(
+                                data=image_data,
+                                mime_type=attachment.content_type
+                            )
+                        )
+                    )
+                except Exception as e:
+                    print(f"Failed to read attachment {attachment.filename}: {e}")
+
+        if not parts:
+            print("Message contained no text or supported images.")
+            return
+
+        user_msg = types.Content(parts=parts)
+        print(f"Received message from {message.author}: {message.content} (Parts: {len(parts)})")
 
         try:
             # Run Agent

@@ -10,6 +10,7 @@ dependencies = [
     "litellm",
     "discord.py",
     "python-dotenv",
+    "Pillow"
 ]
 
 [project.scripts]
