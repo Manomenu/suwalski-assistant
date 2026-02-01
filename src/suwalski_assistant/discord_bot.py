@@ -1,0 +1,108 @@
+import os
+import discord
+from dotenv import load_dotenv
+from google.adk.runners import Runner
+from google.adk.sessions.in_memory_session_service import InMemorySessionService
+from google.genai import types
+
+# Load environment variables
+load_dotenv()
+
+class SuwalskiBot(discord.Client):
+    """
+    Custom Discord Client for Suwalski Assistant.
+    Encapsulates the ADK runner and agent logic.
+    """
+    def __init__(self, runner, agent_name, target_channel_id=None, intents=None):
+        super().__init__(intents=intents)
+        self.runner = runner
+        self.agent_name = agent_name
+        self.target_channel_id = target_channel_id
+
+    async def on_ready(self):
+        print(f'We have logged in as {self.user}')
+        if self.target_channel_id:
+            print(f'Listening on channel ID: {self.target_channel_id}')
+        else:
+            print('Listening on all accessible channels.')
+
+    async def on_message(self, message):
+        # Don't reply to ourselves
+        if message.author == self.user:
+            return
+
+        # Filter by channel if configured
+        if self.target_channel_id and str(message.channel.id) != str(self.target_channel_id):
+            return
+
+        # Use Discord User ID as Session ID
+        user_id = str(message.author.id)
+        session_id = f"session_{user_id}"
+        
+        # Ensure session exists
+        session_service = self.runner.session_service
+        existing_session = await session_service.get_session(app_name=self.runner.app_name, user_id=user_id, session_id=session_id)
+        if not existing_session:
+            await session_service.create_session(app_name=self.runner.app_name, user_id=user_id, session_id=session_id)
+
+        # Prepare input
+        user_msg = types.Content(parts=[types.Part(text=message.content)])
+        print(f"Received message from {message.author}: {message.content}")
+
+        try:
+            # Run Agent
+            response_text = ""
+            async for event in self.runner.run_async(
+                user_id=user_id,
+                session_id=session_id,
+                new_message=user_msg
+            ):
+                # Capture the agent's textual response
+                if event.author == self.agent_name and event.content:
+                    for part in event.content.parts:
+                        if part.text:
+                            response_text += part.text
+
+            # Send response back to Discord
+            if response_text:
+                if len(response_text) > 2000:
+                    for i in range(0, len(response_text), 2000):
+                        await message.channel.send(response_text[i:i+2000])
+                else:
+                    await message.channel.send(response_text)
+                    
+        except Exception as e:
+            print(f"Error processing message: {e}")
+            await message.channel.send("I encountered an error processing your request.")
+
+def run_discord_bot(agent):
+    """
+    Initializes the runner with the provided agent and starts the Discord bot.
+    """
+    token = os.getenv("DISCORD_TOKEN")
+    if not token:
+        raise ValueError("DISCORD_TOKEN environment variable is not set.")
+
+    target_channel_id = os.getenv("DISCORD_CHANNEL_ID")
+
+    # Initialize ADK Runner with the passed agent
+    session_service = InMemorySessionService()
+    bot_runner = Runner(
+        agent=agent,
+        session_service=session_service,
+        app_name="SuwalskiDiscordBot"
+    )
+    
+    # Initialize Discord Client
+    intents = discord.Intents.default()
+    intents.message_content = True
+    
+    print(f"Starting Discord bot with agent: {agent.name}")
+    
+    client = SuwalskiBot(
+        runner=bot_runner, 
+        agent_name=agent.name, 
+        target_channel_id=target_channel_id,
+        intents=intents
+    )
+    client.run(token)

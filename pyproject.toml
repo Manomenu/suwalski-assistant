@@ -8,6 +8,8 @@ dependencies = [
     "google-adk",
     "fastmcp",
     "litellm",
+    "discord.py",
+    "python-dotenv",
 ]
 
 [project.scripts]
