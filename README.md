@@ -19,6 +19,7 @@ Suwalski Assistant is the core hub of a AI-powered system designed for seamless 
 ### Agent Capabilities
 - **Custom Tool Definitions:** Define specific functions and APIs the agent can call.
 - **Workflow Management:** Orchestrate task handoffs and collaboration between different agent personas.
+- **Handwritten Note Processing:** Automatically detects handwritten notes in images and saves them to the Obsidian Vault.
 
 ### Connectivity
 - **MCP Tool Integration:** Seamlessly connect to MCP servers to extend the agent's knowledge and action space.
@@ -42,3 +43,6 @@ cd suwalski-assistant
 ## 📜 License
 
 [Specify License, e.g., MIT or Private]
+
+## TODO
+Create handwritten_notes fail fallback to return to message handling in entry_agent
