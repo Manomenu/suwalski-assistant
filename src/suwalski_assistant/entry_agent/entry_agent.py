@@ -4,6 +4,14 @@ from google.adk.models.llm_request import LlmRequest
 from suwalski_assistant.llm_models import ollama_model
 from suwalski_assistant.handwritten_notes_agent import handwritten_notes_agent
 
+generic_agent = LlmAgent(
+    name="generic_agent",
+    description="Gives helpful answers as discord assistant.",
+    instruction="You are a helpful assistant for user in discord channel. Answer when asked.",
+    model=ollama_model
+)
+
+
 POSSIBLE_NOTE = "POSSIBLE_NOTE"
 
 def validate_possible_note(callback_context: CallbackContext, llm_request: LlmRequest) -> None:
@@ -14,7 +22,7 @@ def validate_possible_note(callback_context: CallbackContext, llm_request: LlmRe
             return None
         if part.inline_data and part.inline_data and part.inline_data.mime_type.startswith('image/'):
             has_image = "TRUE"
-
+            
     callback_context.state[POSSIBLE_NOTE] = has_image
 
 root_agent = LlmAgent(
@@ -26,8 +34,9 @@ root_agent = LlmAgent(
         You delegate tasks to subagents.
 
         If POSSIBLE_NOTE is TRUE: delegate job to *handwritten_notes_agent*.
+        If there is no other sub_agent to delegate job, then delegate a job to *generic_agent*.
     """,
     description="An assistant that delegates tasks to specialized subagents.",
     before_model_callback=[validate_possible_note],
-    sub_agents=[handwritten_notes_agent]
+    sub_agents=[handwritten_notes_agent, generic_agent]
 )

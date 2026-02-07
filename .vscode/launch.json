@@ -5,6 +5,7 @@
             "name": "Debug: Main App (with Infra)",
             "type": "debugpy",
             "request": "launch",
+            "python": "${command:python.interpreterPath}",
             "program": "${workspaceFolder}/src/suwalski_assistant/main.py",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
@@ -15,6 +16,7 @@
             "name": "Debug: Main App",
             "type": "debugpy",
             "request": "launch",
+            "python": "${command:python.interpreterPath}",
             "program": "${workspaceFolder}/src/suwalski_assistant/main.py",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}"
