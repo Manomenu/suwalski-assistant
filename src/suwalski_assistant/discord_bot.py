@@ -1,3 +1,5 @@
+import datetime
+import logging
 import discord
 from google.adk.runners import Runner
 from google.adk.sessions.in_memory_session_service import InMemorySessionService
@@ -16,11 +18,11 @@ class SuwalskiBot(discord.Client):
         self.target_channel_id = target_channel_id
 
     async def on_ready(self):
-        print(f'We have logged in as {self.user}')
+        logging.info(f'We have logged in as {self.user}')
         if self.target_channel_id:
-            print(f'Listening on channel ID: {self.target_channel_id}')
+            logging.info(f'Listening on channel ID: {self.target_channel_id}')
         else:
-            print('Listening on all accessible channels.')
+            logging.info('Listening on all accessible channels.')
 
     async def on_message(self, message):
         # Don't reply to ourselves
@@ -31,9 +33,9 @@ class SuwalskiBot(discord.Client):
         if self.target_channel_id and str(message.channel.id) != str(self.target_channel_id):
             return
 
-        # Use Discord User ID as Session ID
         user_id = str(message.author.id)
-        session_id = f"session_{user_id}"
+        current_date = datetime.date.today().strftime("%d_%m_%Y")
+        session_id = f"session_{user_id}_{current_date}"
         
         # Ensure session exists
         session_service = self.runner.session_service
@@ -48,7 +50,7 @@ class SuwalskiBot(discord.Client):
             
         for attachment in message.attachments:
             if attachment.content_type and attachment.content_type.startswith('image/'):
-                print(f"Processing image attachment: {attachment.filename}")
+                logging.info(f"Processing image attachment: {attachment.filename}")
                 try:
                     image_data = await attachment.read()
                     parts.append(
@@ -60,14 +62,14 @@ class SuwalskiBot(discord.Client):
                         )
                     )
                 except Exception as e:
-                    print(f"Failed to read attachment {attachment.filename}: {e}")
+                    logging.error(f"Failed to read attachment {attachment.filename}: {e}")
 
         if not parts:
-            print("Message contained no text or supported images.")
+            logging.warning("Message contained no text or supported images.")
             return
 
         user_msg = types.Content(parts=parts)
-        print(f"Received message from {message.author}: {message.content} (Parts: {len(parts)})")
+        logging.info(f"Received message from {message.author}: {message.content} (Parts: {len(parts)})")
 
         try:
             # Run Agent
@@ -92,7 +94,7 @@ class SuwalskiBot(discord.Client):
                     await message.channel.send(response_text)
                     
         except Exception as e:
-            print(f"Error processing message: {e}")
+            logging.error(f"Error processing message: {e}")
             await message.channel.send("I encountered an error processing your request.")
 
 def run_discord_bot(agent):
@@ -115,7 +117,7 @@ def run_discord_bot(agent):
     intents = discord.Intents.default()
     intents.message_content = True
     
-    print(f"Starting Discord bot with agent: {agent.name}")
+    logging.info(f"Starting Discord bot with agent: {agent.name}")
     
     client = SuwalskiBot(
         runner=bot_runner, 

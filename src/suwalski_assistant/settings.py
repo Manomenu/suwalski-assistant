@@ -23,14 +23,9 @@ def configure_environment():
 configure_environment()
 
 class Settings(BaseSettings):
-    """
-    Application settings managed by Pydantic.
-    Loads from .env.
-    """
     discord_token: str
     discord_channel_id: Optional[str] = None
     
-    # Ollama / LLM Settings
     ollama_model: str = "ollama/qwen2:0.5b"
     ollama_api_key: str = "ollama"
     ollama_api_base: str = "http://localhost:11434"
