@@ -68,7 +68,7 @@ class SuwalskiBot(discord.Client):
             logging.warning("Message contained no text or supported images.")
             return
 
-        user_msg = types.Content(parts=parts)
+        user_msg = types.Content(role='user', parts=parts)
         logging.info(f"Received message from {message.author}: {message.content} (Parts: {len(parts)})")
 
         try:
