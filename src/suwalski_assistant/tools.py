@@ -3,7 +3,7 @@ from google.adk.models.llm_request import LlmRequest
 from google.adk.models.llm_response import LlmResponse
 
 def content_from_text(text: str) -> types.Content:
-    return types.Content(parts=[types.Part(text=text)])
+    return types.Content(role='model', parts=[types.Part(text=text)])
 
 def modify_response_last_content(response: LlmResponse, text: str) -> LlmResponse:
     response.content[-1] = content_from_text(content_from_text(text))

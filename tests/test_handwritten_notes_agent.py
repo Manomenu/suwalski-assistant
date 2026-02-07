@@ -1,38 +1,34 @@
-
 import pytest
 from unittest.mock import MagicMock
 from google.adk.agents.callback_context import CallbackContext
-from google.adk.models.llm_response import LlmResponse
 from google.genai import types
-from suwalski_assistant.handwritten_notes_agent.handwritten_notes_agent import handwritten_notes_after_callback
+from suwalski_assistant.handwritten_notes_agent.handwritten_notes_agent import handle_handwritten_notes, ImageTypeOutput
+from suwalski_assistant.constants import AGENTIC_OUTPUT_KEYS as aok
 
-def test_handwritten_notes_after_callback_is_note():
+def test_handle_handwritten_notes_is_note():
     # Setup
     callback_context = MagicMock(spec=CallbackContext)
+    callback_context.state = {
+        aok.DETECTED_IMAGE_TYPE: ImageTypeOutput(image_type="NOTES")
+    }
     
-    # Mock LLM Response saying "NOTES"
-    llm_response = LlmResponse(
-        content=types.Content(parts=[types.Part(text="NOTES")])
-    )
-
     # Execute
-    result = handwritten_notes_after_callback(callback_context, llm_response)
+    result = handle_handwritten_notes(callback_context)
 
     # Verify
     assert result is not None
-    assert result.content.parts[0].text == "Notes saved to Obsidian Vault"
+    assert "handwritten notes saved to Obsidian Vault" in result.parts[0].text
 
-def test_handwritten_notes_after_callback_is_other():
+def test_handle_handwritten_notes_is_other():
     # Setup
     callback_context = MagicMock(spec=CallbackContext)
+    callback_context.state = {
+        aok.DETECTED_IMAGE_TYPE: ImageTypeOutput(image_type="OTHER")
+    }
     
-    # Mock LLM Response saying "OTHER"
-    llm_response = LlmResponse(
-        content=types.Content(parts=[types.Part(text="OTHER")])
-    )
-
     # Execute
-    result = handwritten_notes_after_callback(callback_context, llm_response)
+    result = handle_handwritten_notes(callback_context)
 
     # Verify
-    assert result is None
+    assert result is not None
+    assert "Image does not contain handwritten note" in result.parts[0].text
