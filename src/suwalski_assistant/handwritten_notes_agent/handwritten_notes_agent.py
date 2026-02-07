@@ -14,9 +14,7 @@ class ImageTypeOutput(BaseModel):
 
 
 def handle_handwritten_notes(callback_context: CallbackContext) -> Optional[types.Content]:
-    state: ImageTypeOutput = callback_context.state[aok.DETECTED_IMAGE_TYPE]
-    if not isinstance(state, ImageTypeOutput):
-        return content_from_text("Internal handle_handwritten_notes error.")
+    state = ImageTypeOutput(**callback_context.state[aok.DETECTED_IMAGE_TYPE])
     image_type = state.image_type.strip().upper()
 
     if "NOTES" in image_type and "NOT NOTES" not in image_type:

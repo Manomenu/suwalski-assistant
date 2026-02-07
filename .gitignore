@@ -45,6 +45,7 @@ htmlcov/
 .env*
 !.env*local*
 !.env*example*
+!.env*input*
 
 # OS
 .DS_Store

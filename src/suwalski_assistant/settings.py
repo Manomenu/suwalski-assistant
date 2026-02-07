@@ -23,7 +23,8 @@ def configure_environment():
 configure_environment()
 
 class Settings(BaseSettings):
-    discord_token: str
+    input_mode: str = "console"
+    discord_token: Optional[str] = None
     discord_channel_id: Optional[str] = None
     
     ollama_model: str = "ollama/qwen2:0.5b"

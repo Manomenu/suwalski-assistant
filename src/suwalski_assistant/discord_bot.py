@@ -80,7 +80,7 @@ class SuwalskiBot(discord.Client):
                 new_message=user_msg
             ):
                 # Capture the agent's textual response
-                if event.author == self.agent_name and event.content:
+                if event.author != user_id and event.content:
                     for part in event.content.parts:
                         if part.text:
                             response_text += part.text
