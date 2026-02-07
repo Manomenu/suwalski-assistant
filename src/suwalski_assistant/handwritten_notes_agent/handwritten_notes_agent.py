@@ -16,7 +16,7 @@ def handwritten_notes_after_callback(callback_context: CallbackContext, llm_resp
 
     if "NOTES" in text_content.strip().upper() and "NOT NOTES" not in text_content.upper():
         return LlmResponse(content=types.Content(parts=[types.Part(text="Notes saved to Obsidian Vault")]))
-    return None
+    return LlmResponse(content=types.Content(parts=[types.Part(text="Image does not contain handwritten note.")]))
 
 root_agent = LlmAgent(
     name="handwritten_notes_agent",
