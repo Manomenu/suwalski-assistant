@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     ollama_model: str = "ollama/qwen2:0.5b"
     ollama_api_key: str = "ollama"
     ollama_api_base: str = "http://localhost:11434"
+    llm_env: str = "default"
 
     model_config = SettingsConfigDict(
         env_file='.env',
