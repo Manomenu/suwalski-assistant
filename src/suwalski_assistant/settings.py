@@ -4,7 +4,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     """
     Application settings managed by Pydantic.
-    Loads from .env and optionally .env.{APP_ENV}.
+    Loads from .env.
     """
     discord_token: str
     discord_channel_id: Optional[str] = None
