@@ -43,6 +43,7 @@ async def run_console_session(agent):
                 new_message=user_msg
             ):
                 if event.author != user_id and event.content:
+                    response_text = ""
                     for part in event.content.parts:
                         if part.text:
                             response_text += part.text

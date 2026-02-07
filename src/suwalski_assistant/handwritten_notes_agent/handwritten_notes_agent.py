@@ -20,7 +20,7 @@ def handle_handwritten_notes(callback_context: CallbackContext) -> Optional[type
 
     if image_type == "NOTES":
         return content_from_text("Message has been handled, handwritten notes saved to Obsidian Vault.")
-    return content_from_text("Image does not contain handwritten note. Call other agent to answer message.")
+    return content_from_text("Image does not contain handwritten note. Image will not be saved to Obsidian Vault.")
 
 
 handwritten_notes_classifier_agent = LlmAgent(
@@ -31,7 +31,13 @@ handwritten_notes_classifier_agent = LlmAgent(
     output_key=aok.DETECTED_IMAGE_TYPE,
     disallow_transfer_to_parent=True,
     disallow_transfer_to_peers=True,
-    
+    after_agent_callback=handle_handwritten_notes
+)
+
+summarizer = LlmAgent(
+    name="summarizer",
+    model=ollama_model,
+    instruction="Describe in one sentence what has been done with provided image."
 )
 
 root_agent = SequentialAgent(
@@ -40,7 +46,6 @@ root_agent = SequentialAgent(
         Identifies whether provided image is an handwritten note and saves it as markdown in Obsidian if possible. 
         Can be called if there is an image and no text in the message.
     """,
-    sub_agents=[handwritten_notes_classifier_agent],
-    after_agent_callback=handle_handwritten_notes
+    sub_agents=[handwritten_notes_classifier_agent, summarizer],
 )
 
