@@ -1,8 +1,8 @@
-import os
 import discord
 from google.adk.runners import Runner
 from google.adk.sessions.in_memory_session_service import InMemorySessionService
 from google.genai import types
+from suwalski_assistant.settings import settings
 
 class SuwalskiBot(discord.Client):
     """
@@ -99,11 +99,9 @@ def run_discord_bot(agent):
     """
     Initializes the runner with the provided agent and starts the Discord bot.
     """
-    token = os.getenv("DISCORD_TOKEN")
-    if not token:
-        raise ValueError("DISCORD_TOKEN environment variable is not set.")
+    token = settings.discord_token
 
-    target_channel_id = os.getenv("DISCORD_CHANNEL_ID")
+    target_channel_id = settings.discord_channel_id
 
     # Initialize ADK Runner with the passed agent
     session_service = InMemorySessionService()
