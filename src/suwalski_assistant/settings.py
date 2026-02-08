@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     input_mode: str = "console"
     discord_token: Optional[str] = None
     discord_channel_id: Optional[str] = None
+    obsidian_vault_path: Optional[str] = None
     
     ollama_model: str = "ollama/qwen2:0.5b"
     ollama_api_key: str = "ollama"

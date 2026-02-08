@@ -1,6 +1,5 @@
 from suwalski_assistant.entry_agent import entry_agent
-from suwalski_assistant.discord_bot import run_discord_bot
-from suwalski_assistant.console_session import run_console_bot
+from suwalski_assistant.input_interface import run_discord_bot, run_console_bot
 from suwalski_assistant.settings import settings
 import logging
 
