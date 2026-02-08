@@ -13,16 +13,6 @@ class ImageTypeOutput(BaseModel):
     image_type: Literal["NOTES", "OTHER"] = Field(description="'NOTES' if provided image contains handwritten note, 'OTHER' otherwise.")
 
 
-def handle_handwritten_notes(callback_context: CallbackContext) -> Optional[types.Content]:
-    state_data = callback_context.state[aok.DETECTED_IMAGE_TYPE]
-    state = ImageTypeOutput(**state_data) if isinstance(state_data, dict) else state_data
-    image_type = state.image_type.strip().upper()
-
-    if image_type == "NOTES":
-        return content_from_text("Message has been handled, handwritten notes saved to Obsidian Vault.")
-    return content_from_text("Image does not contain handwritten note. Image will not be saved to Obsidian Vault.")
-
-
 handwritten_notes_classifier_agent = LlmAgent(
     name=an.HANDWRITTEN_NOTES_CLASSIFIER_AGENT,
     model=ollama_model,
@@ -30,22 +20,42 @@ handwritten_notes_classifier_agent = LlmAgent(
     output_schema=ImageTypeOutput,
     output_key=aok.DETECTED_IMAGE_TYPE,
     disallow_transfer_to_parent=True,
-    disallow_transfer_to_peers=True,
-    after_agent_callback=handle_handwritten_notes
+    disallow_transfer_to_peers=True
 )
 
-summarizer = LlmAgent(
-    name="summarizer",
+formatter = LlmAgent(
+    name="formatter",
     model=ollama_model,
-    instruction="Describe in one sentence what has been done with provided image."
+    instruction="Writes down markdown file name and below writes markdown content. Take data from {note_markdown_data} if detected_image_type is NOTES. Otherwise inform that image is not a handwritten note."
+)
+
+class NoteMarkdownDataOutput(BaseModel):
+    markdown_title: str
+    markdown_content: str
+
+def verify_if_can_create_note(callback_context: CallbackContext) -> Optional[types.Content]:
+    state_data = callback_context.state[aok.DETECTED_IMAGE_TYPE]
+    state = ImageTypeOutput(**state_data) if isinstance(state_data, dict) else state_data
+    image_type = state.image_type.strip().upper()
+
+    if image_type == "NOTES":
+        return None
+    return content_from_text("Image is not a note, so it cannot be turned into Obsidian note.")
+
+create_markdown_note_agent = LlmAgent(
+    name="create_markdown_note_agent",
+    model=ollama_model,
+    instruction="Transform image provided by user into markdown file. Returns markdown title to 'markdown_title' and markdown content to 'markdown_contnet'",
+    output_key="note_markdown_data",
+    output_schema=NoteMarkdownDataOutput,
+    before_agent_callback=verify_if_can_create_note
 )
 
 root_agent = SequentialAgent(
     name=an.HANDWRITTEN_NOTES_AGENT,
     description="""
-        Identifies whether provided image is an handwritten note and saves it as markdown in Obsidian if possible. 
-        Can be called if there is an image and no text in the message.
+        Checks whether provided image contains handwritten notes. If yes, then it parses it into markdown file and saves to Obsidian Vault.
     """,
-    sub_agents=[handwritten_notes_classifier_agent, summarizer],
+    sub_agents=[handwritten_notes_classifier_agent, create_markdown_note_agent, formatter],
 )
 
