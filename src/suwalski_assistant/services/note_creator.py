@@ -19,8 +19,7 @@ def save_note(title: str, content: str) -> str:
         try:
             vault_path.mkdir(parents=True, exist_ok=True)
         except Exception as e:
-            logging.error(f"Failed to create vault directory: {e}")
-            return f"Error: Failed to create vault directory: {e}"
+            logging.warning(f"Failed to create vault directory: {e}")
 
     # Ensure title has .md extension
     if not title.endswith(".md"):
