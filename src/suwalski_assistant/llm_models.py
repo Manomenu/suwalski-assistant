@@ -12,7 +12,7 @@ async def patched_acompletion(*args, **kwargs):
     if "messages" in kwargs:
         for message in kwargs["messages"]:
             if "content" not in message or message["content"] is None:
-                message["content"] = ""
+                message["content"] = None
     return await _original_acompletion(*args, **kwargs)
 
 litellm.acompletion = patched_acompletion
