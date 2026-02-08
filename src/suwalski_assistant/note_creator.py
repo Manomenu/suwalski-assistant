@@ -25,7 +25,7 @@ def save_note(title: str, content: str) -> str:
     else:
         filename = title
 
-    file_path = os.path.join(vault_path, filename)
+    file_path = os.path.join(vault_path, f'DRAFT_{filename}')
     
     try:
         with open(file_path, "w", encoding="utf-8") as f:

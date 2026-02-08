@@ -54,3 +54,6 @@ We strictly separate infrastructure from application logic during development to
 - **Host:** Private Server (Local Subnetwork)
 - **Runtime:** Python 3.12 (Local) / Docker (Prod)
 - **Integration Points:** Discord API, MCP Servers, Local System APIs, Ollama (Local LLM)
+
+## Further ideas
+- **Obsidian Vault MCP server management** add/delete certain note, look for similar notes, look for notes containing certain data, add relation, etc.  

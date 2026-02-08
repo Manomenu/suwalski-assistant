@@ -19,6 +19,7 @@ class ImageTypeOutput(BaseModel):
 
 
 def detected_notes_condition(callback_context: CallbackContext) -> bool:
+    logging.debug(f"{an.HANDWRITTEN_NOTES_AGENT}: Checking if image contains notes.")
     state_data = callback_context.state[aok.DETECTED_IMAGE_TYPE]
     state = ImageTypeOutput(**state_data) if isinstance(state_data, dict) else state_data
     image_type = state.image_type.strip().upper()
@@ -26,7 +27,12 @@ def detected_notes_condition(callback_context: CallbackContext) -> bool:
     return image_type == "NOTES"
 
 def try_get_markdown_note_data(callback_context: CallbackContext) -> Optional[NoteMarkdownDataOutput]:
-    note_data = NoteMarkdownDataOutput(**callback_context.state.get(aok.NOTE_MARKDOWN_DATA))
+    logging.debug(f"{an.HANDWRITTEN_NOTES_AGENT}: Attempting to retrieve markdown note data from state.")
+    note_data_raw = callback_context.state.get(aok.NOTE_MARKDOWN_DATA)
+    if not note_data_raw:
+        return None
+        
+    note_data = NoteMarkdownDataOutput(**note_data_raw) if isinstance(note_data_raw, dict) else note_data_raw
             
     if note_data and note_data.markdown_title and note_data.markdown_content:
         return note_data
@@ -34,12 +40,15 @@ def try_get_markdown_note_data(callback_context: CallbackContext) -> Optional[No
 
 
 def try_default_user_response(callback_context: CallbackContext) -> Optional[types.Content]:
+    logging.info(f"{an.HANDWRITTEN_NOTES_RESPONSE_AGENT}: Executing before_agent_callback to check for default response.")
     if detected_notes_condition(callback_context):
-       note_data = NoteMarkdownDataOutput(**callback_context.state.get(aok.NOTE_MARKDOWN_DATA))
-       return content_from_text(f"Handwritten notes saved to Obsidian Vault as '{note_data.markdown_title}'")
+       note_data = try_get_markdown_note_data(callback_context)
+       if note_data:
+           return content_from_text(f"Handwritten notes saved to Obsidian Vault as '{note_data.markdown_title}'")
     return None
 
 def verify_handwritten_note_provided(callback_context: CallbackContext) -> Optional[types.Content]:
+    logging.info(f"{an.HANDWIRTTEN_NOTES_CREATE_NOTE_AGENT}: Executing before_agent_callback to verify note presence.")
     state_data = callback_context.state[aok.DETECTED_IMAGE_TYPE]
     state = ImageTypeOutput(**state_data) if isinstance(state_data, dict) else state_data
     image_type = state.image_type.strip().upper()
@@ -49,10 +58,13 @@ def verify_handwritten_note_provided(callback_context: CallbackContext) -> Optio
     return content_from_text("Image is not a note, so it cannot be turned into Obsidian note.")
 
 def try_save_handwritten_note(callback_context: CallbackContext):
-    logging.info(f"{an.HANDWIRTTEN_NOTES_CREATE_NOTE_AGENT}: trying to save handwritten note.")
+    logging.info(f"{an.HANDWIRTTEN_NOTES_CREATE_NOTE_AGENT}: Executing after_agent_callback to save handwritten note.")
     note_data = try_get_markdown_note_data(callback_context)
     if note_data:
-        save_note(note_data.markdown_title, note_data.markdown_content)
+        # Sanitize title to avoid path issues
+        sanitized_title = note_data.markdown_title.replace("/", "_").replace("\\", "_")
+        logging.info(f"{an.HANDWIRTTEN_NOTES_CREATE_NOTE_AGENT}: Saving note with title: {sanitized_title}")
+        save_note(sanitized_title, note_data.markdown_content)
     return None
 
 
@@ -76,7 +88,7 @@ response_for_user = LlmAgent(
 create_markdown_note_agent = LlmAgent(
     name=an.HANDWIRTTEN_NOTES_CREATE_NOTE_AGENT,
     model=ollama_model,
-    instruction="Transform image provided by user into markdown file. Returns markdown title to 'markdown_title' and markdown content to 'markdown_content'. Title shall be without / and \\ to avoid path issues.",
+    instruction="Transform image provided by user into markdown file. Returns markdown title to 'markdown_title' and markdown content to 'markdown_content'. Title shall be without / and \\ to avoid path issues. Write down every word included in a note so it is complete.",
     output_key=aok.NOTE_MARKDOWN_DATA,
     output_schema=NoteMarkdownDataOutput,
     before_agent_callback=verify_handwritten_note_provided,
