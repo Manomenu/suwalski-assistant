@@ -2,13 +2,17 @@ from typing import Optional, Literal
 from google.adk.agents import LlmAgent, SequentialAgent
 from google.adk.agents.callback_context import CallbackContext
 from pydantic import BaseModel, Field
-from suwalski_assistant.generic_agent import generic_agent
 from suwalski_assistant.llm_models import ollama_model
 from suwalski_assistant.constants import AGENTIC_OUTPUT_KEYS as aok
-from suwalski_assistant.tools import *
+from suwalski_assistant.helpers import *
 from suwalski_assistant.constants import AGENT_NAMES as an
-from suwalski_assistant.note_creator import save_note
+from suwalski_assistant.services.note_creator import save_note
 import logging
+
+
+def sanitize_title(title: str) -> str:
+    return title.replace("/", "_").replace("\\", "_")
+
 
 class NoteMarkdownDataOutput(BaseModel):
     markdown_title: str
@@ -44,7 +48,7 @@ def try_default_user_response(callback_context: CallbackContext) -> Optional[typ
     if detected_notes_condition(callback_context):
        note_data = try_get_markdown_note_data(callback_context)
        if note_data:
-           return content_from_text(f"Handwritten notes saved to Obsidian Vault as '{note_data.markdown_title}'")
+           return content_from_text(f"Handwritten notes saved to Obsidian Vault as '{sanitize_title(note_data.markdown_title)}'")
     return None
 
 def verify_handwritten_note_provided(callback_context: CallbackContext) -> Optional[types.Content]:
@@ -62,7 +66,7 @@ def try_save_handwritten_note(callback_context: CallbackContext):
     note_data = try_get_markdown_note_data(callback_context)
     if note_data:
         # Sanitize title to avoid path issues
-        sanitized_title = note_data.markdown_title.replace("/", "_").replace("\\", "_")
+        sanitized_title = sanitize_title(note_data.markdown_title)
         logging.info(f"{an.HANDWIRTTEN_NOTES_CREATE_NOTE_AGENT}: Saving note with title: {sanitized_title}")
         save_note(sanitized_title, note_data.markdown_content)
     return None

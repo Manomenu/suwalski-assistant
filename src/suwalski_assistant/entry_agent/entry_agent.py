@@ -7,7 +7,7 @@ from suwalski_assistant.llm_models import ollama_model
 from suwalski_assistant.handwritten_notes_agent import handwritten_notes_agent
 from suwalski_assistant.generic_agent import generic_agent
 from suwalski_assistant.constants import *
-from suwalski_assistant.tools import *
+from suwalski_assistant.helpers import *
 
 def rule_wrapper(text: str) -> str:
     return f'<RULE>{text}</RULE>'
