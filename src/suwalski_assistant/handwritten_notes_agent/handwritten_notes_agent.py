@@ -75,7 +75,7 @@ def try_save_handwritten_note(callback_context: CallbackContext):
 handwritten_notes_classifier_agent = LlmAgent(
     name=an.HANDWRITTEN_NOTES_CLASSIFIER_AGENT,
     model=ollama_model,
-    instruction="Decide whether provided image contains handwritten notes. NOTES - image contains handwritten notes, OTHER - image does not contains handwritten notes.",
+    instruction="Decide whether last provided image contains handwritten notes. NOTES - image contains handwritten notes, OTHER - image does not contains handwritten notes.",
     output_schema=ImageTypeOutput,
     output_key=aok.DETECTED_IMAGE_TYPE,
     disallow_transfer_to_parent=True,
