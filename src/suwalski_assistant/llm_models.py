@@ -1,9 +1,12 @@
 import logging
 from google.adk.models.lite_llm import LiteLlm
 from suwalski_assistant.settings import settings
+import litellm
 
 logging.getLogger("LiteLLM").setLevel(logging.CRITICAL)
 logging.info(f"LLM_ENV: {settings.llm_env}")
+
+litellm.telemetry = False
 
 class FixedLiteLlm(LiteLlm):
     async def acompletion(self, *args, **kwargs):
