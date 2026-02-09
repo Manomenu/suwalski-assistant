@@ -1,5 +1,6 @@
 import datetime
 import logging
+from uuid import uuid4
 import discord
 from google.adk.runners import Runner
 from google.adk.sessions.in_memory_session_service import InMemorySessionService
@@ -35,7 +36,7 @@ class SuwalskiBot(discord.Client):
 
         user_id = str(message.author.id)
         current_date = datetime.date.today().strftime("%d_%m_%Y")
-        session_id = f"session_{user_id}_{current_date}"
+        session_id = f"{user_id}_{uuid4()}"
         
         # Ensure session exists
         session_service = self.runner.session_service
