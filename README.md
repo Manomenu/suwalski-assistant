@@ -45,4 +45,8 @@ cd suwalski-assistant
 [Specify License, e.g., MIT or Private]
 
 ## TODO
-Create handwritten_notes fail fallback to return to message handling in entry_agent
+- Handle multiple images, so they get combined into one big note
+- Obsidian manager - enhance note, fix note, add relevant links, Graph-RAG search app (integrated into discord chat) -> (MAYBE: create fully integrated NAS-native note AI-first app that integrates natively with discord)
+- Add some assure message, that bot is working on processing image. (Inform about process if it takes longer)
+- If Assistant isn't good to trust, then create explicit channel just for processing notes (you can add there text for some note formatting guidances - for example ask to aggregate shattered data, prettify it, etc., connect to other note?)
+- For Note input create blocking behaviour, do not start processing next note, until previous one is processed. - it will save models from throttling. 
