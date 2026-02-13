@@ -50,3 +50,5 @@ cd suwalski-assistant
 - Add some assure message, that bot is working on processing image. (Inform about process if it takes longer)
 - If Assistant isn't good to trust, then create explicit channel just for processing notes (you can add there text for some note formatting guidances - for example ask to aggregate shattered data, prettify it, etc., connect to other note?)
 - For Note input create blocking behaviour, do not start processing next note, until previous one is processed. - it will save models from throttling. 
+
+- Queue notes creating to extra queue that is processed only in late hours. besides that I may just switch to most commonly used 142 LLM (qwen3-next?)
