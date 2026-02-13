@@ -16,7 +16,7 @@ This file provides context and technical guidelines for AI agents working on the
 
 - **Agentic-Oriented Programming:** All core agentic logic MUST leverage the **Google Agent Development Kit (ADK)** using `InMemoryRunner`.
 - **Testing:** Comprehensive testing is required. See [tests/GEMINI.md](tests/GEMINI.md).
-- **Package Initialization (`__init__.py`):** Leverage `__init__.py` files to alias generic/framework-required names to semantic ones within the project scope. For example, always expose the required `root_agent` as a more meaningful name (e.g., `ollama_agent = root_agent`) to improve code discoverability and readability.
+- **Package Initialization (`__init__.py`):** Leverage `__init__.py` files to alias generic/framework-required names to semantic ones within the project scope. For example, always expose the required `root_agent` as a more meaningful name (e.g., `base_agent = root_agent`) to improve code discoverability and readability.
 - **Debugging:** A `.vscode/launch.json` is maintained for VS Code debugging, utilizing tasks to auto-start infrastructure.
 - **Dependency Management:**
 - **Comments in Code** Comments are minimalistic, they do not expain code that is self-explanatory. Comment added only if necessary. 

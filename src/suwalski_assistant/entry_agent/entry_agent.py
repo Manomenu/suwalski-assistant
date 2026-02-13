@@ -3,7 +3,7 @@ from google.adk.agents import LlmAgent
 from google.adk.agents.callback_context import CallbackContext
 from google.adk.models.llm_request import LlmRequest
 from google.adk.models.llm_response import LlmResponse
-from suwalski_assistant.llm_models import ollama_model
+from suwalski_assistant.llm_models import base_model
 from suwalski_assistant.handwritten_notes_agent import handwritten_notes_agent
 from suwalski_assistant.generic_agent import generic_agent
 from suwalski_assistant.constants import *
@@ -35,7 +35,7 @@ generic_rule = rule_wrapper(f"If there is no other suggestion delegate a job to 
 
 root_agent = LlmAgent(
     name=AGENT_NAMES.ENTRY_AGENT,
-    model=ollama_model,
+    model=base_model,
     instruction=f"""
         You are a personal assistant. 
         You answer and do helpful actions. 

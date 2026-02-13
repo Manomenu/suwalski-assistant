@@ -2,7 +2,7 @@ from typing import Optional, Literal
 from google.adk.agents import LlmAgent, SequentialAgent
 from google.adk.agents.callback_context import CallbackContext
 from pydantic import BaseModel, Field
-from suwalski_assistant.llm_models import ollama_model
+from suwalski_assistant.llm_models import vision_model, base_model
 from suwalski_assistant.constants import AGENTIC_OUTPUT_KEYS as aok
 from suwalski_assistant.helpers import *
 from suwalski_assistant.constants import AGENT_NAMES as an
@@ -74,24 +74,30 @@ def try_save_handwritten_note(callback_context: CallbackContext):
 
 handwritten_notes_classifier_agent = LlmAgent(
     name=an.HANDWRITTEN_NOTES_CLASSIFIER_AGENT,
-    model=ollama_model,
-    instruction="Decide whether last provided image contains handwritten notes. NOTES - image contains handwritten notes, OTHER - image does not contains handwritten notes.",
+    model=vision_model,
+    instruction="Decide whether last provided image contains handwritten note. NOTES - image contains handwritten notes, OTHER - image does not contains handwritten notes.",
     output_schema=ImageTypeOutput,
     output_key=aok.DETECTED_IMAGE_TYPE,
     disallow_transfer_to_parent=True,
     disallow_transfer_to_peers=True
 )
 
+def clean_up_session_data(callback_context: CallbackContext):
+    for event in callback_context.session.events:
+        event.content.parts = [part for part in event.content.parts if not part.inline_data or not isinstance(part.inline_data, types.Blob)]
+    callback_context.session.events = [event for event in callback_context.session.events if len(event.content.parts) > 0]
+    
+
 response_for_user = LlmAgent(
     name=an.HANDWRITTEN_NOTES_RESPONSE_AGENT,
-    model=ollama_model,
-    instruction=f"You have to point out what does the provided image contains. Briefly, just one sentence.",
+    model=base_model,
+    instruction=f"Based on previous descriptions of image describe what did it contain. Briefly, just one sentence.",
     before_agent_callback=try_default_user_response
 )
 
 create_markdown_note_agent = LlmAgent(
     name=an.HANDWIRTTEN_NOTES_CREATE_NOTE_AGENT,
-    model=ollama_model,
+    model=vision_model,
     instruction="Transform image provided by user into markdown file. Returns markdown title to 'markdown_title' and markdown content to 'markdown_content'. Title shall be without / and \\ to avoid path issues. Write down every word included in a note so it is complete.",
     output_key=aok.NOTE_MARKDOWN_DATA,
     output_schema=NoteMarkdownDataOutput,
@@ -105,5 +111,6 @@ root_agent = SequentialAgent(
         Checks whether provided image contains handwritten notes. If yes, then it parses it into markdown file and saves to Obsidian Vault.
     """,
     sub_agents=[handwritten_notes_classifier_agent, create_markdown_note_agent, response_for_user],
+    after_agent_callback=clean_up_session_data
 )
 

@@ -5,6 +5,7 @@ import discord
 from google.adk.runners import Runner
 from google.adk.sessions.in_memory_session_service import InMemorySessionService
 from google.genai import types
+from suwalski_assistant.helpers import MessageQueue
 from suwalski_assistant.settings import settings
 
 class SuwalskiBot(discord.Client):
@@ -17,6 +18,7 @@ class SuwalskiBot(discord.Client):
         self.runner = runner
         self.agent_name = agent_name
         self.target_channel_id = target_channel_id
+        self.message_queue = MessageQueue()
 
     async def on_ready(self):
         logging.info(f'We have logged in as {self.user}')
@@ -36,7 +38,7 @@ class SuwalskiBot(discord.Client):
 
         user_id = str(message.author.id)
         current_date = datetime.date.today().strftime("%d_%m_%Y")
-        session_id = f"{user_id}_{uuid4()}"
+        session_id = f"{user_id}_{current_date}"
         
         # Ensure session exists
         session_service = self.runner.session_service
@@ -72,8 +74,15 @@ class SuwalskiBot(discord.Client):
         user_msg = types.Content(role='user', parts=parts)
         logging.info(f"Received message from {message.author}: {message.content} (Parts: {len(parts)})")
 
+        await self.message_queue.add(user_msg)
+        logging.info("Message added to queue")
+        
+        while await self.message_queue.try_consume(lambda msg: self._run_agent(msg, user_id, session_id, message)):
+            pass
+            
+    async def _run_agent(self, user_msg: types.Content, user_id: str, session_id: str, message):
+        logging.info("Consuming message from queue")
         try:
-            # Run Agent
             response_text = ""
             async for event in self.runner.run_async(
                 user_id=user_id,

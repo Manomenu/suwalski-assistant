@@ -12,9 +12,9 @@ done
 echo "Ollama service started."
 
 # Pull the model if specified
-if [ ! -z "$OLLAMA_MODEL" ]; then
+if [ ! -z "$BASE_MODEL" ]; then
     # Remove 'ollama/' prefix if present (e.g., 'ollama/qwen2:0.5b' -> 'qwen2:0.5b')
-    MODEL_NAME=${OLLAMA_MODEL#ollama/}
+    MODEL_NAME=${BASE_MODEL#ollama/}
     echo "Pulling model: $MODEL_NAME"
     ollama pull $MODEL_NAME
     echo "Model $MODEL_NAME pulled successfully."

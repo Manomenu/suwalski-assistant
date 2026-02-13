@@ -28,9 +28,14 @@ class Settings(BaseSettings):
     discord_channel_id: Optional[str] = None
     obsidian_vault_path: Optional[str] = None
     
-    ollama_model: str = "ollama/qwen2:0.5b"
-    ollama_api_key: str = "ollama"
-    ollama_api_base: str = "http://localhost:11434"
+    base_model: str = "openai/gpt-oss:20b"
+    base_api_key: str = "sk-ea48ac97132e44c199095ca1101f"
+    base_api_base: str = "https://mubiss.com/ollama/v1"
+
+    vision_model: str = "openai/qwen3-vl:32b"
+    vision_api_key: str = "sk-ea48ac97132e44c199095ca1101f"
+    vision_api_base: str = "https://mubiss.com/ollama/v1"
+
     llm_env: str = "default"
 
     model_config = SettingsConfigDict(

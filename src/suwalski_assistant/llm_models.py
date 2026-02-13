@@ -17,8 +17,14 @@ async def patched_acompletion(*args, **kwargs):
 
 litellm.acompletion = patched_acompletion
 
-ollama_model = LiteLlm(
-    model=settings.ollama_model, 
-    api_key=settings.ollama_api_key, 
-    api_base=settings.ollama_api_base.rstrip("/")
+base_model = LiteLlm(
+    model=settings.base_model, 
+    api_key=settings.base_api_key, 
+    api_base=settings.base_api_base.rstrip("/")
+)
+
+vision_model = LiteLlm(
+    model=settings.vision_model, 
+    api_key=settings.vision_api_key, 
+    api_base=settings.vision_api_base.rstrip("/")
 )
