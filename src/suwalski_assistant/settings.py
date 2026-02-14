@@ -23,20 +23,20 @@ def configure_environment():
 configure_environment()
 
 class Settings(BaseSettings):
-    input_mode: str = "console"
+    input_mode: str = "discord"
     discord_token: Optional[str] = None
     discord_channel_id: Optional[str] = None
     obsidian_vault_path: Optional[str] = None
     
     base_model: str = "openai/gpt-oss:20b"
-    base_api_key: str = "sk-ea48ac97132e44c199095ca1101f"
-    base_api_base: str = "https://mubiss.com/ollama/v1"
+    base_api_key: str = "sk-..."
+    base_api_base: str = "your_llm_endpoint"
 
     vision_model: str = "openai/qwen3-vl:32b"
-    vision_api_key: str = "sk-ea48ac97132e44c199095ca1101f"
-    vision_api_base: str = "https://mubiss.com/ollama/v1"
+    vision_api_key: str = "sk-..."
+    vision_api_base: str = "your_llm_endpoint"
 
-    llm_env: str = "default"
+    llm_env: str = "llm-local"
 
     model_config = SettingsConfigDict(
         env_file='.env',
