@@ -7,6 +7,7 @@ from suwalski_assistant.constants import AGENTIC_OUTPUT_KEYS as aok
 from suwalski_assistant.helpers import *
 from suwalski_assistant.constants import AGENT_NAMES as an
 from suwalski_assistant.services.note_creator import save_note
+from suwalski_assistant.settings import settings
 import logging
 
 
@@ -48,7 +49,7 @@ def try_default_user_response(callback_context: CallbackContext) -> Optional[typ
     if detected_notes_condition(callback_context):
        note_data = try_get_markdown_note_data(callback_context)
        if note_data:
-           return content_from_text(f"Handwritten notes saved to Obsidian Vault as '{sanitize_title(note_data.markdown_title)}'")
+           return content_from_text(f"Handwritten notes saved to {settings.notes_location_name} as '{sanitize_title(note_data.markdown_title)}'")
     return None
 
 def verify_handwritten_note_provided(callback_context: CallbackContext) -> Optional[types.Content]:
@@ -59,7 +60,7 @@ def verify_handwritten_note_provided(callback_context: CallbackContext) -> Optio
 
     if image_type == "NOTES":
         return None
-    return content_from_text("Image is not a note, so it cannot be turned into Obsidian note.")
+    return content_from_text(f"Image is not a note, so it cannot be turned into {settings.notes_location_name} note.")
 
 def try_save_handwritten_note(callback_context: CallbackContext):
     logging.info(f"{an.HANDWIRTTEN_NOTES_CREATE_NOTE_AGENT}: Executing after_agent_callback to save handwritten note.")
@@ -107,8 +108,8 @@ create_markdown_note_agent = LlmAgent(
 
 root_agent = SequentialAgent(
     name=an.HANDWRITTEN_NOTES_AGENT,
-    description="""
-        Checks whether provided image contains handwritten notes. If yes, then it parses it into markdown file and saves to Obsidian Vault.
+    description=f"""
+        Checks whether provided image contains handwritten notes. If yes, then it parses it into markdown file and saves to {settings.notes_location_name}.
     """,
     sub_agents=[handwritten_notes_classifier_agent, create_markdown_note_agent, response_for_user],
     after_agent_callback=clean_up_session_data

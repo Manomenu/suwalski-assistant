@@ -26,7 +26,8 @@ class Settings(BaseSettings):
     input_mode: str = "discord"
     discord_token: Optional[str] = None
     discord_channel_id: Optional[str] = None
-    obsidian_vault_path: Optional[str] = None
+    notes_path: Optional[str] = None
+    notes_location_name: str = "Local Notes"
     
     base_model: str = "openai/gpt-oss:20b"
     base_api_key: str = "sk-..."

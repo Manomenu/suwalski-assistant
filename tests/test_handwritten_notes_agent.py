@@ -10,6 +10,7 @@ from suwalski_assistant.handwritten_notes_agent.handwritten_notes_agent import (
     ImageTypeOutput
 )
 from suwalski_assistant.constants import AGENTIC_OUTPUT_KEYS as aok
+from suwalski_assistant.settings import settings
 
 @pytest.fixture
 def mock_callback_context():
@@ -65,7 +66,7 @@ class TestHandwrittenNotesCallbacks:
         
         result = try_default_user_response(mock_callback_context)
         assert result is not None
-        assert "Handwritten notes saved to Obsidian Vault as 'My Great Note'" in result.parts[0].text
+        assert f"Handwritten notes saved to {settings.notes_location_name} as 'My Great Note'" in result.parts[0].text
 
     def test_try_default_user_response_is_other(self, mock_callback_context):
         """Test that no default response is returned if it's not a note."""

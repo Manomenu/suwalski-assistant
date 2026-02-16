@@ -4,13 +4,13 @@ from suwalski_assistant.settings import settings
 
 def save_note(title: str, content: str) -> str:
     """
-    Saves a markdown note to the Obsidian vault path.
+    Saves a markdown note to the configured notes path.
     Returns the path to the saved file.
     """
-    vault_path_str = settings.obsidian_vault_path
+    vault_path_str = settings.notes_path
     if not vault_path_str:
-        logging.error("Obsidian vault path is not configured.")
-        return "Error: Obsidian vault path is not configured."
+        logging.error(f"{settings.notes_location_name} path is not configured.")
+        return f"Error: {settings.notes_location_name} path is not configured."
 
     # Use pathlib for more robust Windows/UNC path handling
     vault_path = Path(vault_path_str)
@@ -19,7 +19,7 @@ def save_note(title: str, content: str) -> str:
         try:
             vault_path.mkdir(parents=True, exist_ok=True)
         except Exception as e:
-            logging.warning(f"Failed to create vault directory: {e}")
+            logging.warning(f"Failed to create directory: {e}")
 
     # Ensure title has .md extension
     if not title.endswith(".md"):

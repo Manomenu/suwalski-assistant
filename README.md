@@ -19,7 +19,7 @@ Suwalski Assistant is the core hub of a AI-powered system designed for seamless 
 ### Agent Capabilities
 - **Custom Tool Definitions:** Define specific functions and APIs the agent can call.
 - **Workflow Management:** Orchestrate task handoffs and collaboration between different agent personas.
-- **Handwritten Note Processing:** Automatically detects handwritten notes in images and saves them to the Obsidian Vault.
+- **Handwritten Note Processing:** Automatically detects handwritten notes in images and saves them to the configured notes location.
 
 ### Connectivity
 - **MCP Tool Integration:** Seamlessly connect to MCP servers to extend the agent's knowledge and action space.
@@ -46,7 +46,7 @@ cd suwalski-assistant
 
 ## TODO
 - Handle multiple images, so they get combined into one big note
-- Obsidian manager - enhance note, fix note, add relevant links, Graph-RAG search app (integrated into discord chat) -> (MAYBE: create fully integrated NAS-native note AI-first app that integrates natively with discord)
+- Notes manager - enhance note, fix note, add relevant links, Graph-RAG search app (integrated into discord chat) -> (MAYBE: create fully integrated NAS-native note AI-first app that integrates natively with discord)
 - Add some assure message, that bot is working on processing image. (Inform about process if it takes longer)
 - If Assistant isn't good to trust, then create explicit channel just for processing notes (you can add there text for some note formatting guidances - for example ask to aggregate shattered data, prettify it, etc., connect to other note?)
 - For Note input create blocking behaviour, do not start processing next note, until previous one is processed. - it will save models from throttling. 
