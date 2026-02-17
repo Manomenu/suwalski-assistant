@@ -30,11 +30,11 @@ class Settings(BaseSettings):
     notes_location_name: str = "Local Notes"
     
     base_model: str = "openai/gpt-oss:20b"
-    base_api_key: str = "sk-..."
+    base_api_key: str = ""
     base_api_base: str = "your_llm_endpoint"
 
     vision_model: str = "openai/qwen3-vl:32b"
-    vision_api_key: str = "sk-..."
+    vision_api_key: str = ""
     vision_api_base: str = "your_llm_endpoint"
 
     llm_env: str = "llm-local"
