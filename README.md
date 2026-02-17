@@ -4,6 +4,8 @@ Suwalski Assistant is the core hub of a AI-powered system designed for seamless 
 
 ## [Setup (click to read)](./docs/setup.md)
 
+## [User guide (click to read)](./docs/usage.md)
+
 ## 🚀 Core Objectives
 
 - **Unified Communication:** Facilitates interaction through multiple channels, starting with Discord, to provide a natural interface for system management and assistance.
