@@ -23,6 +23,7 @@ FILES_TO_COPY=(
 # Copy root files
 for file in "${FILES_TO_COPY[@]}"; do
     if [ -f "$file" ]; then
+        echo "Copying $file..."
         cp "$file" "$TARGET_DIR/"
     else
         echo "Warning: $file not found."
@@ -31,20 +32,44 @@ done
 
 # Copy directories
 if [ -d "src" ]; then
-    cp -r src "$TARGET_DIR/"
+    echo "Copying src directory..."
+    cp -r "src" "$TARGET_DIR/"
+else
+    echo "Warning: src directory not found."
 fi
 
-# Copy contents of docs
+# Copy docs directory and its content
 if [ -d "docs" ]; then
+    echo "Copying docs content..."
     mkdir -p "$TARGET_DIR/docs"
     cp -r docs/* "$TARGET_DIR/docs/"
+else
+    echo "Warning: docs directory not found."
 fi
 
 # Copy deploy script
 if [ -f "scripts/deploy/run.bat" ]; then
-    cp "scripts/deploy/run.bat" "$TARGET_DIR/"
+    echo "Copying run.bat to scripts/deploy/..."
+    mkdir -p "$TARGET_DIR/scripts/deploy"
+    cp "scripts/deploy/run.bat" "$TARGET_DIR/scripts/deploy/"
 else
     echo "Warning: scripts/deploy/run.bat not found."
 fi
 
-echo "Bundle created successfully in $TARGET_DIR"
+echo "Renaming occurrences of 'suwalski' to 'notes' in $TARGET_DIR..."
+
+# 1. Replace content in all files
+# Use find with -type f to ensure we only process files
+find "$TARGET_DIR" -type f -not -path '*/.*' -exec sed -i 's/Suwalski/Notes/g; s/suwalski/notes/g' {} +
+
+# 2. Rename files and directories (bottom-up to avoid path invalidation)
+# We handle both cases to ensure we catch everything
+while IFS= read -r -d '' path; do
+    new_path=$(echo "$path" | sed 's/Suwalski/Notes/g; s/suwalski/notes/g')
+    if [ "$path" != "$new_path" ]; then
+        echo "Renaming: $path -> $new_path"
+        mv "$path" "$new_path"
+    fi
+done < <(find "$TARGET_DIR" -depth \( -name "*suwalski*" -o -name "*Suwalski*" \) -print0)
+
+echo "Bundle created and sanitized successfully in $TARGET_DIR"
